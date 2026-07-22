@@ -1,0 +1,16 @@
+# Entorno Virtual Python
+it-market-env/
+venv/
+env/
+__pycache__/
+*.pyc
+
+# Archivos de entorno y credenciales
+.env
+
+# Archivos generados y bases de datos locales
+database/jobs.db
+exports/*.xlsx
+
+# Archivos del sistema
+.DS_Store
