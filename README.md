@@ -84,8 +84,5 @@ PYTHONPATH=. streamlit run app/main.py
 * **Bolsas de Trabajo Local / Nacional:** Empleo Nuevo, OCC Mundial, Computrabajo, Talenteca, Jooble, Indeed, Glassdoor, LinkedIn Jobs.
 * **Portales Remotos Internacionales:** Remote.co.
 * **Empresas Clave Objetivo:** Enteracloud, Nerium, Schneider Electric, Thermo Fisher, KIO Networks, SONDA, Medtronic, Jabil, Honeywell, Skyworks.
-EOF
 
 ```
-
----
