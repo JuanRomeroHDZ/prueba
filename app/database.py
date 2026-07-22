@@ -16,6 +16,8 @@ def init_db():
             puesto TEXT NOT NULL,
             nivel TEXT,
             area TEXT,
+            career_path TEXT,
+            prioridad_empresa TEXT DEFAULT '⚪ Normal',
             ubicacion TEXT,
             modalidad TEXT,
             salario_min REAL,
@@ -40,4 +42,4 @@ def get_connection():
 
 if __name__ == "__main__":
     init_db()
-    print("Base de datos SQLite inicializada exitosamente.")
+    print("Base de datos SQLite adaptada con Ruta de Carrera y Prioridad de Empresa.")
