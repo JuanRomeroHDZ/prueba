@@ -1,6 +1,6 @@
 import re
+import hashlib
 
-# Mapeo a tu Ruta de Crecimiento Profesional
 CAREER_PATH_MAP = {
     "Networking": "Infraestructura Base",
     "Infrastructure & Systems": "Infraestructura Base",
@@ -8,7 +8,6 @@ CAREER_PATH_MAP = {
     "Cybersecurity & SOC": "Seguridad"
 }
 
-# Matriz de Prioridades
 HIGH_PRIORITY_COMPANIES = [
     "enteracloud", "nerium", "schneider electric", "thermo fisher", 
     "kio networks", "sonda", "scitum", "alestra", "telmex", "megacable", "totalplay"
@@ -21,30 +20,21 @@ MEDIUM_PRIORITY_COMPANIES = [
     "cisco", "fortinet", "palo alto", "dell", "vmware", "red hat", "aws"
 ]
 
-# Palabras clave obligatorias de TI (Inglés / Español)
 IT_KEYWORDS = [
-    # Redes / NOC
     "redes", "network", "networking", "network engineer", "network administrator", 
     "network analyst", "noc engineer", "lan engineer", "wan engineer", "cisco engineer",
     "cisco", "vlan", "ospf", "bgp", "switching", "routing", "firewall", "pfsense", "fortinet",
-    
-    # Infraestructura / Sistemas
     "infraestructura", "infrastructure", "systems engineer", "system administrator", 
     "sysadmin", "linux administrator", "windows administrator", "server administrator", 
     "data center engineer", "soporte it", "it support", "virtualizacion", "proxmox", "vmware",
-    "linux", "debian", "ubuntu", "windows server", "active directory", "backup", "storage",
-    
-    # Cloud / DevOps
+    "linux", "debian", "ubuntu", "windows server", "active directory", "backup", "storage", "truenas",
     "cloud", "cloud engineer", "azure administrator", "aws engineer", "cloud support engineer", 
     "devops engineer", "platform engineer", "devsecops", "azure", "aws", "gcp", "kubernetes", "docker", "terraform",
-    
-    # Ciberseguridad / SOC
     "seguridad", "ciberseguridad", "cybersecurity", "soc analyst", "security analyst", 
     "cybersecurity analyst", "security engineer", "network security engineer", 
     "vulnerability analyst", "incident response analyst", "siem", "wazuh", "splunk", "edr"
 ]
 
-# Lista Negra de puestos no técnicos/no deseados
 EXCLUDE_KEYWORDS = [
     "redes sociales", "social media", "marketing", "mercadotecnia", "publicidad",
     "hotel", "hotelería", "camarero", "camarera", "limpieza", "intendencia",
@@ -53,6 +43,19 @@ EXCLUDE_KEYWORDS = [
     "contabilidad", "contador", "auxiliar administrativo", "mantenimiento industrial",
     "mecanico", "electromecanico", "enfermero", "medico"
 ]
+
+def generate_fingerprint(empresa: str, puesto: str, ubicacion: str) -> str:
+    """
+    Genera un hash SHA-256 único normalizando empresa, puesto y ubicación
+    para evitar duplicados entre distintas fuentes.
+    """
+    clean_empresa = re.sub(r'[^a-zA-Z0-9]', '', empresa.lower())
+    clean_puesto = re.sub(r'[^a-zA-Z0-9]', '', puesto.lower())
+    clean_loc = "tijuana" if "tijuana" in ubicacion.lower() or "b.c" in ubicacion.lower() else "remoto"
+    
+    raw_str = f"{clean_empresa}|{clean_puesto}|{clean_loc}"
+    return hashlib.sha256(raw_str.encode('utf-8')).hexdigest()
+
 
 def get_company_priority(company_name: str) -> str:
     comp = company_name.lower()
@@ -161,6 +164,13 @@ def detect_modality(text: str) -> str:
 def classify_job(puesto: str, descripcion: str) -> dict:
     text = f"{puesto} {descripcion}".lower()
     
+    # Detección profunda de tecnologías específicas
+    known_techs = [
+        "Cisco", "Linux", "Proxmox", "TrueNAS", "Wazuh", "pfSense", "Azure", "AWS", 
+        "VMware", "Docker", "Kubernetes", "Fortinet", "Splunk", "Python", "Active Directory"
+    ]
+    detected = [t for t in known_techs if re.search(r'\b' + re.escape(t) + r'\b', text, re.IGNORECASE)]
+    
     if any(kw in text for kw in ["soc", "siem", "ciberseguridad", "security", "wazuh", "vulnerability"]):
         area = "Cybersecurity & SOC"
     elif any(kw in text for kw in ["cloud", "aws", "azure", "devops", "kubernetes", "docker", "terraform"]):
@@ -174,5 +184,6 @@ def classify_job(puesto: str, descripcion: str) -> dict:
     
     return {
         "area": area,
-        "career_path": career_path
+        "career_path": career_path,
+        "tecnologias": ", ".join(detected) if detected else "Infraestructura TI"
     }

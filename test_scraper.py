@@ -13,25 +13,21 @@ from app.scraper.tijuana import (
 from app.utils.parser import (
     classify_job, parse_salary, detect_modality,
     extract_experience, extract_english, extract_certifications,
-    is_valid_it_job, get_company_priority, is_tijuana_or_remote
+    is_valid_it_job, get_company_priority, is_tijuana_or_remote,
+    generate_fingerprint
 )
 from app.database import get_connection, init_db
 from datetime import datetime
 
-print("🚀 Recolectando vacantes bilingües de TI en Tijuana & Remoto...\n")
+print("🚀 Recolectando vacantes con deduplicación por Fingerprint...\n")
 
 init_db()
 
 keywords = [
-    # Redes / NOC
     "Network Engineer", "Network Administrator", "Cisco Engineer", "Redes",
-    # Infraestructura / Sysadmin
     "Infrastructure Engineer", "Systems Engineer", "Linux Administrator", "Administrador de Sistemas",
-    # Cloud / DevOps
     "Cloud Engineer", "DevOps Engineer", "Azure Administrator", "AWS Engineer",
-    # Ciberseguridad / SOC
     "Ciberseguridad", "SOC Analyst", "Security Engineer", "Cybersecurity Analyst",
-    # Empresas Clave de Tijuana
     "Schneider Electric", "Thermo Fisher", "Enteracloud", "KIO Networks", "Nerium", "Medtronic", "Jabil"
 ]
 
@@ -57,6 +53,7 @@ conn = get_connection()
 cursor = conn.cursor()
 
 registrados = 0
+duplicados = 0
 descartados = 0
 fecha_hoy = datetime.now().strftime("%Y-%m-%d")
 
@@ -67,6 +64,9 @@ for v in vacantes_ordenadas:
         descartados += 1
         continue
 
+    # Generar Hash de Fingerprint
+    fingerprint = generate_fingerprint(v["empresa"], v["puesto"], v["ubicacion"])
+    
     parsed = classify_job(v["puesto"], desc_completa)
     prioridad = get_company_priority(v["empresa"])
     s_min, s_max, s_avg = parse_salary(v.get("salario_raw", ""))
@@ -77,11 +77,12 @@ for v in vacantes_ordenadas:
     
     try:
         cursor.execute('''
-            INSERT OR IGNORE INTO jobs 
-            (fecha_consulta, empresa, puesto, prioridad_empresa, career_path, ubicacion, modalidad, 
+            INSERT INTO jobs 
+            (fingerprint, fecha_consulta, empresa, puesto, prioridad_empresa, career_path, ubicacion, modalidad, 
              salario_min, salario_max, salario_promedio, moneda, area, tecnologias, experiencia, ingles, certificaciones, fuente, url, descripcion)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
+            fingerprint,
             fecha_hoy,
             v["empresa"],
             v["puesto"],
@@ -94,7 +95,7 @@ for v in vacantes_ordenadas:
             s_avg,
             "MXN",
             parsed["area"],
-            "Especializada TI",
+            parsed["tecnologias"],
             exp,
             ingles,
             certs,
@@ -102,14 +103,14 @@ for v in vacantes_ordenadas:
             v["url"],
             desc_completa
         ))
-        if cursor.rowcount > 0:
-            registrados += 1
+        registrados += 1
     except Exception:
-        continue
+        duplicados += 1
 
 conn.commit()
 conn.close()
 
-print(f"\n📊 Resumen de recolección para Tijuana:")
-print(f"✅ Vacantes reales de TI registradas: {registrados}")
+print(f"\n📊 Resumen del Proceso:")
+print(f"✅ Vacantes ÚNICAS registradas: {registrados}")
+print(f"🔄 Vacantes duplicadas fusionadas por Fingerprint: {duplicados}")
 print(f"❌ Ofertas no técnicas / fuera de región descartadas: {descartados}")

@@ -11,6 +11,7 @@ def init_db():
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS jobs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            fingerprint TEXT UNIQUE NOT NULL,
             fecha_consulta TEXT NOT NULL,
             empresa TEXT,
             puesto TEXT NOT NULL,
@@ -25,7 +26,7 @@ def init_db():
             salario_promedio REAL,
             moneda TEXT DEFAULT 'MXN',
             fuente TEXT NOT NULL,
-            url TEXT UNIQUE,
+            url TEXT,
             experiencia TEXT,
             ingles TEXT,
             tecnologias TEXT,
@@ -42,4 +43,4 @@ def get_connection():
 
 if __name__ == "__main__":
     init_db()
-    print("Base de datos SQLite adaptada con Ruta de Carrera y Prioridad de Empresa.")
+    print("Base de datos configurada con soporte para Fingerprinting único.")
