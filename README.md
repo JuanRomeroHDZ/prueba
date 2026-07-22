@@ -8,7 +8,7 @@
 **IT Market Analyzer MX** es un sistema de Inteligencia de Mercado diseñado para recopilar, normalizar y analizar vacantes laborales del sector de Tecnologías de la Información en México, con enfoque especializado en **Tijuana, Baja California** y posiciones **100% Remotas**.
 
 El proyecto rastrea la demanda real del mercado para trazar la ruta de crecimiento profesional:  
-**Infraestructura de Redes $\rightarrow$ Cloud & Automatización $\rightarrow$ Ciberseguridad & SOC**.
+**Infraestructura de Redes → Cloud & Automatización → Ciberseguridad & SOC**
 
 ---
 
@@ -44,11 +44,13 @@ IT-Market-Analyzer-MX/
 ├── requirements.txt
 └── README.md
 
+```
+
 ---
 
-### Instalación y uso en sistema linux (Debian)
+## 🚀 Instalación y Uso en Linux (Debian)
 
-#### 1. Clonar el repositorio y preparar el entorno
+### 1. Clonar el repositorio y preparar el entorno
 
 ```bash
 git clone [https://github.com/TU_USUARIO/IT-Market-Analyzer-MX.git](https://github.com/TU_USUARIO/IT-Market-Analyzer-MX.git)
@@ -58,16 +60,32 @@ python3 -m venv it-market-env
 source it-market-env/bin/activate
 pip install -r requirements.txt
 playwright install chromium
+
 ```
 
-#### 2. Ejecutar la recolección de datos
+### 2. Ejecutar la recolección de datos
+
 ```bash
 PYTHONPATH=. python3 test_scraper.py
+
 ```
 
-#### 3. Iniciar el Dashboard
+### 3. Iniciar el Dashboard
+
 ```bash
 PYTHONPATH=. streamlit run app/main.py
+
 ```
 
+---
 
+## 📈 Fuentes Monitoreadas
+
+* **Bolsas de Trabajo Local / Nacional:** Empleo Nuevo, OCC Mundial, Computrabajo, Talenteca, Jooble, Indeed, Glassdoor, LinkedIn Jobs.
+* **Portales Remotos Internacionales:** Remote.co.
+* **Empresas Clave Objetivo:** Enteracloud, Nerium, Schneider Electric, Thermo Fisher, KIO Networks, SONDA, Medtronic, Jabil, Honeywell, Skyworks.
+EOF
+
+```
+
+---
