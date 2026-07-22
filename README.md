@@ -74,7 +74,6 @@ PYTHONPATH=. python3 test_scraper.py
 
 ```bash
 PYTHONPATH=. streamlit run app/main.py
-
 ```
 
 ---
@@ -85,4 +84,3 @@ PYTHONPATH=. streamlit run app/main.py
 * **Portales Remotos Internacionales:** Remote.co.
 * **Empresas Clave Objetivo:** Enteracloud, Nerium, Schneider Electric, Thermo Fisher, KIO Networks, SONDA, Medtronic, Jabil, Honeywell, Skyworks.
 
-```
